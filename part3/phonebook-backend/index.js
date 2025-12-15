@@ -1,7 +1,21 @@
 const express = require('express')
+const morgan = require('morgan')
+
+// Exercise 3.8
+morgan.token('person', (request) => {
+    if (request.method === 'POST') {
+        return JSON.stringify(request.body)
+    }
+    return ''
+})
+
 const app = express()
 
 app.use(express.json())
+// Exercise 3.7
+app.use(morgan(':method :url :status :res[content-length] - :response-time ms :person'))
+// Exercise 3.9
+app.use(express.static('dist'))
 
 let persons = [
     {
@@ -62,12 +76,12 @@ app.post('/api/persons', (request, response) => {
 
     // Exercise 3.6
     if (!body.name || !body.number) {
-        response.status(400).json({ error: 'The name or number is missing.' })
+        return response.status(400).json({ error: 'The name or number is missing.' })
     }
 
     const nameExists = persons.some(p => p.name == body.name)
     if (nameExists) {
-        response.status(400).json({ error: 'Name must be unique.' })
+        return response.status(400).json({ error: 'Name must be unique.' })
     }
 
     const person = {
@@ -81,7 +95,13 @@ app.post('/api/persons', (request, response) => {
     response.json(person)
 })
 
-const PORT = 3001
+const unknownEndpoint = (request, response) => {
+    response.status(404).send({ error: 'unknown endpoint' })
+}
+
+app.use(unknownEndpoint)
+
+const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {
     console.log(`Server running on ${PORT}`)
 })
