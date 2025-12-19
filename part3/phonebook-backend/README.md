@@ -94,7 +94,7 @@ Through building this project, I gained hands-on experience with:
 
 **Frontend:**
 
-- React 18
+- React 19
 - Axios
 - Vite
 
